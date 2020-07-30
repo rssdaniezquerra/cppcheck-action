@@ -112,6 +112,7 @@ def commit_changes():
     sp.call(set_email, shell=True)
     sp.call(set_user, shell=True)
 
+    print("target branch: "+TARGET_BRANCH)
     git_checkout = f'git checkout {TARGET_BRANCH}'
     git_add = f'git add {out_file}'
     git_commit = 'git commit -m "cppcheck report added/updated"'

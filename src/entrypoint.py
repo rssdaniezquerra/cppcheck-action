@@ -38,9 +38,9 @@ FORCE_LANGUAGE = os.environ['INPUT_FORCE_LANGUAGE'] or 'disable'
 MAX_CTU_DEPTH = os.environ['INPUT_MAX_CTU_DEPTH'] or 'disable'
 OUTPUT_FILE = os.environ['INPUT_OUTPUT_FILE'] or 'cppcheck_report.txt'
 PLATFORM = os.environ['INPUT_PLATFORM'] or 'disable'
+RULES_FILE = os.environ['INPUT_RULES_FILE'] or ''
 
 command = ""
-
 
 def prepare_command():
     global command
@@ -53,6 +53,10 @@ def prepare_command():
 
     if SKIP_PREPROCESSOR == 'enable':
         command = command + " --E"
+
+    if not empty(RULES_FILE):
+        command = command + f' --rule-file={RULES_FILE}'
+        
 
     enable_val = 'all'  # default fallback value
 

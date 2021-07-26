@@ -117,7 +117,7 @@ def commit_changes():
     git_stash = f'git stash'
     git_stash_pop = f'git stash pop'
     git_checkout = f'git checkout {TARGET_BRANCH}'
-    git_main = f'git chechout main'
+    git_main = f'git checkout main'
     git_add = f'git add {out_file}'
     git_commit = 'git commit -m "cppcheck report added/updated"'
     git_branch = f'git branch checker'

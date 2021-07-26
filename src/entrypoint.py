@@ -126,12 +126,13 @@ def commit_changes():
     print('Committing reports.......')
 
     #sp.call(git_checkout, shell=True)
-    sp.call(git_branch, shell=True)
-    sp.call(git_add, shell=True)
-    sp.call(git_commit, shell=True)
+    #sp.call(git_branch, shell=True)
+    sp.call(git_stash, shell=True)
     sp.call(git_fetch, shell=True)
     sp.call(git_checkout, shell=True)
-    sp.call(git_merge, shell=True)
+    sp.call(git_stash_pop, shell=True)
+    sp.call(git_add, shell=True)
+    sp.call(git_commit, shell=True)
 
 
 def push_changes():

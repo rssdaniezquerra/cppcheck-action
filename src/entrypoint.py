@@ -38,9 +38,9 @@ FORCE_LANGUAGE = os.environ['INPUT_FORCE_LANGUAGE'] or 'disable'
 MAX_CTU_DEPTH = os.environ['INPUT_MAX_CTU_DEPTH'] or 'disable'
 OUTPUT_FILE = os.environ['INPUT_OUTPUT_FILE'] or 'cppcheck_report.txt'
 PLATFORM = os.environ['INPUT_PLATFORM'] or 'disable'
+RULES_FILE = os.environ['INPUT_RULES_FILE'] or ''
 
 command = ""
-
 
 def prepare_command():
     global command
@@ -53,6 +53,10 @@ def prepare_command():
 
     if SKIP_PREPROCESSOR == 'enable':
         command = command + " --E"
+
+    if not empty(RULES_FILE):
+        command = command + f' --rule-file={RULES_FILE}'
+        
 
     enable_val = 'all'  # default fallback value
 
@@ -113,11 +117,15 @@ def commit_changes():
     sp.call(set_user, shell=True)
 
     print("target branch: "+TARGET_BRANCH)
-    git_checkout = f'git checkout {TARGET_BRANCH}'
+    git_stash = f'git stash'
+    git_stash_pop = f'git stash pop'
+    git_checkout = f'git checkout origin/{TARGET_BRANCH}'
     git_add = f'git add {out_file}'
     git_commit = 'git commit -m "cppcheck report added/updated"'
     print('Committing reports.......')
 
+    sp.call(git_stash, shell=True)
+    sp.call(git_checkout, shell=True)
     sp.call(git_checkout, shell=True)
     sp.call(git_add, shell=True)
     sp.call(git_commit, shell=True)

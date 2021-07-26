@@ -56,6 +56,12 @@ inputs:
     description: " files where the result to be dumped"
     default: "cppcheck_report.txt"
     required: false
+
+  rules_file:
+    description: "A file with custom rules defined to be used by cppchecker"
+    default: ""
+    required: false
+
   target_branch:
     description: "Branch that the badge will target. Defaults to the current branch."
     default: ""

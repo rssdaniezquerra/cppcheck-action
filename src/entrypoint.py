@@ -113,16 +113,24 @@ def commit_changes():
     sp.call(set_user, shell=True)
 
     print("target branch: "+TARGET_BRANCH)
+    git_fetch = f'git fetch'
     git_stash = f'git stash'
     git_stash_pop = f'git stash pop'
-    git_checkout = f'git checkout origin/{TARGET_BRANCH}'
+    git_checkout = f'git checkout {TARGET_BRANCH}'
+    git_main = f'git checkout main'
     git_add = f'git add {out_file}'
     git_commit = 'git commit -m "cppcheck report added/updated"'
+    git_branch = f'git branch checker'
+    git_merge = f'git merge checker'
+    git_branch_del = f'git branch rm checker'
     print('Committing reports.......')
 
+    #sp.call(git_checkout, shell=True)
+    #sp.call(git_branch, shell=True)
     sp.call(git_stash, shell=True)
+    sp.call(git_fetch, shell=True)
     sp.call(git_checkout, shell=True)
-    sp.call(git_checkout, shell=True)
+    sp.call(git_stash_pop, shell=True)
     sp.call(git_add, shell=True)
     sp.call(git_commit, shell=True)
 

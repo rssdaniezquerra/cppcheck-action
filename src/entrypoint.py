@@ -146,6 +146,7 @@ def push_changes():
 
 def main():
 
+    print("GITHUB_ACTOR:" + GITHUB_ACTOR)
     if (GITHUB_EVENT_NAME == 'pull_request') and (GITHUB_ACTOR != GITHUB_REPOSITORY_OWNER):
         return
 

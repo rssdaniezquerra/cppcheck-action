@@ -96,7 +96,7 @@ def prepare_command():
 
 
     #Adds the propper cppcheck version
-    command = command +f" --std=c++14"
+    command = command + " --std=c++14"
 
     out_file = OUTPUT_FILE
 

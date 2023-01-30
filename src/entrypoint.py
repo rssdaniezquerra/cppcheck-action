@@ -94,6 +94,10 @@ def prepare_command():
     if PLATFORM != 'disable':
         command = command + f" --platform={PLATFORM}"
 
+
+    #Adds the propper cppcheck version
+    command = command +f" --std=c++14"
+
     out_file = OUTPUT_FILE
 
 

@@ -98,6 +98,9 @@ def prepare_command():
     #Adds the propper cppcheck version
     command = command + " --std=c++14"
 
+    #Add support for qt libraries
+    command = command + "--library=qt"
+
     out_file = OUTPUT_FILE
 
 

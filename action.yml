@@ -27,6 +27,11 @@ inputs:
     default: "disable"
     required: false
 
+  suppress_test:
+    description: "Give a check that shall be supressed"
+    default: ""
+    required: false
+
   inconclusive:
     description: " Allow that Cppcheck reports even though the analysis is inconclusive."
     default: "enable"

@@ -38,6 +38,7 @@ FORCE_LANGUAGE = os.environ['INPUT_FORCE_LANGUAGE'] or 'disable'
 MAX_CTU_DEPTH = os.environ['INPUT_MAX_CTU_DEPTH'] or 'disable'
 OUTPUT_FILE = os.environ['INPUT_OUTPUT_FILE'] or 'cppcheck_report.txt'
 PLATFORM = os.environ['INPUT_PLATFORM'] or 'disable'
+SUPRESS_TEST= os.environ['SUPRESS_TEST'] or 'disable'
 
 command = ""
 
@@ -94,12 +95,17 @@ def prepare_command():
     if PLATFORM != 'disable':
         command = command + f" --platform={PLATFORM}"
 
+    if SUPRESS_TEST != 'disable':
+        command = command +f" --suppress={SUPPRESS_TEST}"
+
 
     #Adds the propper cppcheck version
     command = command + " --std=c++14"
 
     #Add support for qt libraries
     command = command + "--library=qt"
+
+    command = command + "--suppress=missingInclude"
 
     out_file = OUTPUT_FILE
 

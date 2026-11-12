@@ -57,6 +57,21 @@ inputs:
     default: "cppcheck_report.txt"
     required: false
 
+  std:
+    description: "C++ standard of the checked code (cppcheck --std)"
+    default: "c++17"
+    required: false
+
+  fail_on:
+    description: "Comma separated severities that make the job fail (error, warning, style, performance, portability, information) or none"
+    default: "error,warning"
+    required: false
+
+  suppress:
+    description: "Comma separated checks to suppress, as cppcheck --suppress takes them (id, id:file or id:file:line), or none. By default the include warnings: the action passes no include paths"
+    default: "missingInclude,missingIncludeSystem"
+    required: false
+
   rules_file:
     description: "A file with custom rules defined to be used by cppchecker"
     default: ""

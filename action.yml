@@ -27,11 +27,6 @@ inputs:
     default: "disable"
     required: false
 
-  suppress_test:
-    description: "Give a check that shall be supressed"
-    default: ""
-    required: false
-
   inconclusive:
     description: " Allow that Cppcheck reports even though the analysis is inconclusive."
     default: "enable"
@@ -60,6 +55,21 @@ inputs:
   output_file:
     description: " files where the result to be dumped"
     default: "cppcheck_report.txt"
+    required: false
+
+  std:
+    description: "C++ standard of the checked code (cppcheck --std)"
+    default: "c++17"
+    required: false
+
+  fail_on:
+    description: "Comma separated severities that make the job fail (error, warning, style, performance, portability, information) or none"
+    default: "error,warning"
+    required: false
+
+  suppress:
+    description: "Comma separated checks to suppress, as cppcheck --suppress takes them (id, id:file or id:file:line), or none. By default the include warnings: the action passes no include paths"
+    default: "missingInclude,missingIncludeSystem"
     required: false
 
   rules_file:

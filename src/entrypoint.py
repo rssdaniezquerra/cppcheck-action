@@ -1,5 +1,8 @@
 import os
+import re
+import shlex
 import subprocess as sp
+import sys
 
 
 GITHUB_EVENT_NAME = os.environ['GITHUB_EVENT_NAME']
@@ -38,6 +41,11 @@ FORCE_LANGUAGE = os.environ['INPUT_FORCE_LANGUAGE'] or 'disable'
 MAX_CTU_DEPTH = os.environ['INPUT_MAX_CTU_DEPTH'] or 'disable'
 OUTPUT_FILE = os.environ['INPUT_OUTPUT_FILE'] or 'cppcheck_report.txt'
 PLATFORM = os.environ['INPUT_PLATFORM'] or 'disable'
+STD = os.environ.get('INPUT_STD') or 'c++17'
+# Severities that make the job fail (comma separated). "none" never fails
+FAIL_ON = os.environ.get('INPUT_FAIL_ON') or 'error,warning'
+# Checks to suppress (comma separated, each as cppcheck --suppress takes it: id, id:file or id:file:line). "none" keeps all
+SUPPRESS = os.environ.get('INPUT_SUPPRESS') or 'missingInclude,missingIncludeSystem'
 
 command = ""
 
@@ -95,19 +103,46 @@ def prepare_command():
         command = command + f" --platform={PLATFORM}"
 
 
-    #Adds the propper cppcheck version
-    command = command + " --std=c++14"
+    # C++ standard of the checked code (the leading space matters: it used to produce "--std=c++14--library=qt",
+    # which cppcheck >= 2.14 rejects, so no analysis ran at all)
+    command = command + f" --std={STD}"
 
     #Add support for qt libraries
-    command = command + "--library=qt"
+    command = command + " --library=qt"
+
+    for suppression in SUPPRESS.split(','):
+        suppression = suppression.strip()
+
+        if suppression and (suppression != 'none'):
+            command = command + f" --suppress={shlex.quote( suppression )}"
 
     out_file = OUTPUT_FILE
 
 
 def run_cppcheck():
+    """Runs cppcheck. Returns its exit code: non-zero means it could not analyse (bad option, crash...)."""
     global command
     command = command + f" --output-file={out_file} ."
-    sp.call(command, shell=True)
+    print("Running: " + command)
+    return sp.call(command, shell=True)
+
+
+def count_findings():
+    """Counts the findings of the report whose severity is in FAIL_ON."""
+    severities = [s.strip() for s in FAIL_ON.split(',') if s.strip() and s.strip() != 'none']
+    if not severities:
+        return 0
+
+    pattern = re.compile(r'^[^:\s][^:]*:\d+:\d+: (' + '|'.join(map(re.escape, severities)) + r'):')
+    found = 0
+
+    with open(out_file, encoding='utf-8', errors='replace') as report:
+        for line in report:
+            if pattern.match(line):
+                print(line.rstrip())
+                found += 1
+
+    return found
 
 
 def commit_changes():
@@ -153,13 +188,26 @@ def push_changes():
 
 def main():
 
-    if (GITHUB_EVENT_NAME == 'pull_request') and (GITHUB_ACTOR != GITHUB_REPOSITORY_OWNER):
-        return
+    # It used to return here on every pull request whose author was not the repository owner (an organization
+    # never opens pull requests), so the analysis never ran on pull requests
 
     prepare_command()
-    run_cppcheck()
+    cppcheck_result = run_cppcheck()
+
+    if (cppcheck_result != 0) or (not os.path.isfile(out_file)):
+        print(f"cppcheck failed (exit code {cppcheck_result}): no report was generated")
+        sys.exit(1)
+
+    findings = count_findings()
+
     commit_changes()
     push_changes()
+
+    if findings > 0:
+        print(f"cppcheck: {findings} finding(s) with severity in [{FAIL_ON}]. See {out_file}")
+        sys.exit(1)
+
+    print(f"cppcheck: no findings with severity in [{FAIL_ON}]")
 
 
 if __name__ == '__main__':
